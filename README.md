@@ -16,3 +16,18 @@ This dataset provides a real-world example of binary classification with a mix o
 
 ## c. GitHub Repository Link
 [https://github.com/chocoblin/adult-income-classifier](https://github.com/chocoblin/adult-income-classifier)
+
+## d. Comparison Table (Tuned Models)
+
+| ML Model | Accuracy | AUC | Precision | Recall | F1 | MCC |
+|---|---|---|---|---|---|---|
+| Logistic Regression | 0.7916 | 0.8039 | 0.6553 | 0.3020 | 0.4134 | 0.3413 |
+| Decision Tree (tuned) | 0.8440 | 0.8862 | 0.7036 | 0.6196 | 0.6589 | 0.5602 |
+| KNN (tuned) | 0.8165 | 0.8556 | 0.6400 | 0.5610 | 0.5979 | 0.4814 |
+| Naive Bayes | 0.7858 | 0.8259 | 0.6308 | 0.2877 | 0.3951 | 0.3191 |
+| Random Forest (tuned) | 0.8628 | 0.9119 | 0.7742 | 0.6149 | 0.6854 | 0.6056 |
+
+*Note: Baseline (default hyperparameter) results and comparison also available
+in `model/train_models.ipynb` — hyperparameter tuning via GridSearchCV
+improved Decision Tree AUC by +0.136 and MCC by +0.064, the largest gain of
+any model, by addressing overfitting from unconstrained tree depth.*
