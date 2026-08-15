@@ -1,3 +1,5 @@
+os
+joblib
 numpy
 pandas
 matplotlib
