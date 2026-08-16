@@ -51,22 +51,27 @@ def preprocess(df, encoders):
 
     return X_df.values, y_true
 
-# metrics computation
-def compute_metrics(model, X_scaled, y_true):
-    y_pred = model.predict(X_scaled)
+#metrics computation function
+def compute_metrics(model, X_scaled, y_true, threshold=0.50):
+    # get raw probability scores for the positive class (>50K)
     y_proba = model.predict_proba(X_scaled)[:, 1]
+    
+    # apply the dynamic threshold custom rule
+    y_pred = (y_proba >= threshold).astype(int)
+    
     return {
         "Accuracy": accuracy_score(y_true, y_pred),
-        "AUC": roc_auc_score(y_true, y_proba),
-        "Precision": precision_score(y_true, y_pred),
-        "Recall": recall_score(y_true, y_pred),
-        "F1 Score": f1_score(y_true, y_pred),
+        "AUC": roc_auc_score(y_true, y_proba), # AUC remains unaffected by threshold shifts
+        "Precision": precision_score(y_true, y_pred, zero_division=0),
+        "Recall": recall_score(y_true, y_pred, zero_division=0),
+        "F1 Score": f1_score(y_true, y_pred, zero_division=0),
         "MCC": matthews_corrcoef(y_true, y_pred),
     }, y_pred
 
 
+
 # sidebar
-st.sidebar.markdown("**Aditya**  \nGitHub: [chocoblin](https://github.com/chocoblin)  \nBITS Roll No: 2025AC05657")
+st.sidebar.markdown("**Aditya Raj**  \nGitHub: [chocoblin](https://github.com/chocoblin)  \nBITS Roll No: 2025AC05657")
 st.sidebar.divider()
 st.sidebar.header("Setup")
 uploaded_file = st.sidebar.file_uploader("Upload test data (CSV)", type=["csv"])
@@ -110,10 +115,19 @@ tab1, tab2 = st.tabs(["Single Model", "Compare All Models"])
 # tab 1: single model deep dive
 with tab1:
     selected_model_name = st.selectbox("Select a model", list(MODEL_FILES.keys()))
-
+    
+    # new threshold slider addition right beneath the dropdown
+    threshold = st.slider(
+        "Decision Threshold (lowering it catches more high earners, it'ss pretty cool!)", 
+        min_value=0.0, 
+        max_value=1.0, 
+        value=0.50, 
+        step=0.05
+    )
+    
     try:
         model = load_model(MODEL_FILES[selected_model_name])
-        metrics, y_pred = compute_metrics(model, X_scaled, y_true)
+        metrics, y_pred = compute_metrics(model, X_scaled, y_true, threshold=threshold)  #slider passed to the function
         y_proba = model.predict_proba(X_scaled)[:, 1]
     except Exception as e:
         st.error(f"Error running model: {e}")
@@ -133,7 +147,8 @@ with tab1:
         labels = ["<=50K", ">50K"]
         text = [[f"{cm[i][j]}<br>({cm_pct[i][j]:.1f}%)" for j in range(2)]
                 for i in range(2)]
-        # pick text color per-cell based on background darkness for readability
+        
+        # conditional formatting for text color based on the value in the confusion matrix
         max_val = cm.max()
         text_colors = [["white" if cm[i][j] > max_val * 0.5 else "#0a0a0a"
                          for j in range(2)] for i in range(2)]
@@ -142,6 +157,8 @@ with tab1:
             z=cm, x=labels, y=labels, colorscale="Blues", showscale=False,
             hovertemplate="Actual: %{y}<br>Predicted: %{x}<br>Count: %{z}<extra></extra>",
         ))
+
+        # adding text annotations to the heatmap
         for i in range(2):
             for j in range(2):
                 cm_fig.add_annotation(
@@ -220,7 +237,7 @@ with tab2:
     with col1:
         st.subheader("Metric Comparison")
         metric_to_plot = st.selectbox(
-            "Metric to compare", results_df.columns, index=5
+            "Metric to compare", results_df.columns, index=0   #0 is for accuracy, 1 for AUC, 2 for precision, 3 for recall, 4 for F1 score, 5 for MCC
         )
         plot_df = results_df[[metric_to_plot]].reset_index().sort_values(
             metric_to_plot, ascending=True
@@ -234,9 +251,9 @@ with tab2:
         st.plotly_chart(bar_fig, use_container_width=True)
 
     with col2:
-        st.subheader("Overall Shape (Radar)")
+        st.subheader("Overall Shape (Radar chart)")
         radar_models = st.multiselect(
-            "Models to include", results_df.index.tolist(),
+            "Models to include (multi-select via dropdown)", results_df.index.tolist(),
             default=[results_df["MCC"].idxmax(), results_df["MCC"].idxmin()],
         )
         if radar_models:
@@ -266,5 +283,5 @@ with tab2:
     )
 
 st.caption("Model, scaler, and preprocessing pipeline trained on the UCI Adult Income dataset."
-           "Metrics are computed live on your uploaded sample and may differ slightly from the full-test-set results reported in the training notebook/README due to sample size. "
+           "Metrics are computed live on the uploaded sample and may differ slightly from the full-test-set results reported in the training notebook/README due to sample size."
            "See README for full methodology and model comparison.")
