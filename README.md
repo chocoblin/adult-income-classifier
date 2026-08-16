@@ -58,21 +58,21 @@ Logistic Regression and Naive Bayes have few/no meaningful hyperparameters to tu
 ### In Plain English
 
 - **Random Forest wins because it's a committee, not a lone genius.**
-  ~250 trees vote instead of one tree overfitting on its own quirks.
+    ~250 trees vote instead of one tree overfitting on its own quirks.
 
 - **LR and Naive Bayes play it safe.** 
-  Since ~75% of people earn ≤50K, guessing "≤50K" a lot is a decent shortcut to high accuracy — it just means they miss most of the actual high earners. 
-  **We could've fixed this at training time with `class_weight='balanced'`** (tells the model to penalize mistakes on the rare class harder), but instead used the app's **threshold slider** — drag it below 0.50 to watch Recall go up (and Precision go down) live, no retraining needed.
+    Since ~75% of people earn ≤50K, guessing "≤50K" a lot is a decent shortcut to high accuracy — it just means they miss most of the actual high earners. 
+    **We could've fixed this at training time with `class_weight='balanced'`** (tells the model to penalize mistakes on the rare class harder), but instead used the app's **threshold slider** — drag it below 0.50 to watch Recall go up (and Precision go down) live, no retraining needed.
 
 - **Turning categories into plain numbers quietly hurts KNN and LR more than trees.** 
-  Trees just ask yes/no questions, so it doesn't matter.
-  KNN and LR do math on those numbers, so "category 4" ends up looking closer to "category 3" than it should — even though that's meaningless.
+    Trees just ask yes/no questions, so it doesn't matter.
+    KNN and LR do math on those numbers, so "category 4" ends up looking closer to "category 3" than it should — even though that's meaningless.
 
 - **Tuning gave Decision Tree the biggest glow-up (AUC +0.136)** 
-  Just by telling it to stop growing so deep. Turns out it wasn't a bad model, just an overconfident one.
+    Just by telling it to stop growing so deep. Turns out it wasn't a bad model, just an overconfident one.
 
 - The **radar chart** (Compare All Models tab) makes this imbalance visible instead of just numeric
-  LR and Naive Bayes visibly cave in on the Recall axis while Random Forest stays nice and round.
+    LR and Naive Bayes visibly cave in on the Recall axis while Random Forest stays nice and round.
 
 ## Streamlit App Features
 The deployed app ([link](https://2025ac05657-adult-income-classifier.streamlit.app)) allows the user to:
@@ -122,7 +122,7 @@ Could be helpful to use a command like this in case streamlit command is not rec
 & "c:\Users\adityA\miniconda3\python.exe" -m streamlit run app.py
 ```
 
-where the exact path can be found out by doing the following in your venv of choice:
+where the exact python path can be found out by doing the following in your venv of choice:
 
 ```
 import sys
@@ -131,8 +131,8 @@ print(sys.executable)
 
 ---
 
-*Built with equal parts scikit-learn, google tabs, and mild panic about the 18-Aug deadline, the app went through more UI iterations than the actual model tuning. The confusion matrix alone survived a seaborn phase, a Plotly phase, and an "accidentally invisible white-on-white text" phase before it finally agreed to be sqyuare.
-**If the Random Forest could talk, it would probably say "I told you so" to the other four models. And at this point, to the confusion matrix as well :D** *
+Built with equal parts scikit-learn, google tabs, and mild panic about the 18-Aug deadline, the app went through more UI iterations than the actual model tuning. The confusion matrix alone survived a seaborn phase, a Plotly phase, and an "accidentally invisible white-on-white text" phase before it finally agreed to be sqyuare.
+## If the Random Forest could talk, it would probably say "I told you so" to the other four models. And at this point, to the confusion matrix as well :D
 
 
 
